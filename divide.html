@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>除法練習</title>
+    <link rel="icon" type="image/png" href="https://www.iconpacks.net/icons/4/free-icon-slash-13238.png">
+    <link rel="apple-touch-icon" href="https://www.iconpacks.net/icons/4/free-icon-slash-13238.png">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: #f0f0f0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            background-color: white;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .title-section {
+            background-color: transparent;
+            box-shadow: none;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .settings {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+
+        select {
+            width: 120px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .score-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 70px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .correct-score { color: #4CAF50; }
+        .wrong-score { color: #f44336; }
+
+        .question-section {
+            text-align: center;
+        }
+
+        .question {
+            font-size: 32px;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .answer-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .answer-group {
+            text-align: center;
+        }
+
+        .input-box {
+            width: 100px;
+            height: 40px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.3s;
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .check-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .next-button {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .reset-button {
+            width: 100%;
+            background-color: #ff9800;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: auto 0;
+        }
+
+        #message {
+            min-height: 24px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .game-container {
+                width: 90%;
+                max-width: 500px;
+                min-height: auto;
+                margin: 20px;
+                border-radius: 15px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            }
+        }
+
+        @keyframes explosion {
+            0% { transform: scale(1); opacity: 1; }
+            20% { transform: scale(1.2); opacity: 0.8; }
+            40% { transform: scale(0.9); opacity: 0.6; }
+            60% { transform: scale(1.1); opacity: 0.4; }
+            80% { transform: scale(0.95); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .home-button {
+            display: block;
+            width: 100%;
+            padding: 8px 0;
+            background-color: #607D8B;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin: auto 0;
+        }
+
+        .home-button:hover {
+            background-color: #455A64;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+
+
+        <div class="section">
+            <div class="settings">
+                <div class="setting-item">
+                    <label>被除數位數：</label>
+                    <select id="dividendDigits">
+                        <option value="2">2位數</option>
+                        <option value="3" selected>3位數</option>
+                        <option value="4">4位數</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>除數位數：</label>
+                    <select id="divisorDigits">
+                        <option value="1" selected>1位數</option>
+                        <option value="2">2位數</option>
+                        <option value="3">3位數</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-label">答對</div>
+                    <div class="score-value correct-score" id="correct-count">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">答錯</div>
+                    <div class="score-value wrong-score" id="wrong-count">0</div>
+                </div>
+                <div class="score-item">
+                    <a href="learning.html" class="home-button">回主選單</a>
+                </div>
+                <div class="score-item">
+                    <button class="reset-button" onclick="resetScores()">計分歸零</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section question-section">
+            <div class="question" id="question"></div>
+            <div class="answer-container">
+                <div class="answer-group">
+                    <label>商數</label>
+                    <input type="tel" 
+                           inputmode="numeric" 
+                           pattern="[0-9]*" 
+                           class="input-box" 
+                           id="quotient">
+                </div>
+                <div class="answer-group">
+                    <label>餘數</label>
+                    <input type="tel" 
+                           inputmode="numeric" 
+                           pattern="[0-9]*" 
+                           class="input-box" 
+                           id="remainder">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="button check-button" onclick="checkAnswer()">檢查答案</button>
+                <button class="button next-button" onclick="generateNewQuestion()">下一題</button>
+            </div>
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        let dividend, divisor, correctQuotient, correctRemainder;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        function loadScores() {
+            correctCount = parseInt(localStorage.getItem('correctCount')) || 0;
+            wrongCount = parseInt(localStorage.getItem('wrongCount')) || 0;
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('wrong-count').textContent = wrongCount;
+            localStorage.setItem('correctCount', correctCount);
+            localStorage.setItem('wrongCount', wrongCount);
+        }
+
+        function resetScores() {
+            correctCount = 0;
+            wrongCount = 0;
+            updateScoreDisplay();
+            
+            const scoreBoard = document.querySelector('.score-board');
+            scoreBoard.style.animation = 'explosion 0.5s ease-in-out';
+            setTimeout(() => {
+                scoreBoard.style.animation = '';
+            }, 500);
+        }
+
+        function getRandomNumber(digits) {
+            const min = Math.pow(10, digits - 1);
+            const max = Math.pow(10, digits) - 1;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateNewQuestion() {
+            const dividendDigits = parseInt(document.getElementById('dividendDigits').value);
+            const divisorDigits = parseInt(document.getElementById('divisorDigits').value);
+
+            dividend = getRandomNumber(dividendDigits);
+            divisor = getRandomNumber(divisorDigits);
+            
+            correctQuotient = Math.floor(dividend / divisor);
+            correctRemainder = dividend % divisor;
+            
+            document.getElementById('question').innerHTML = 
+                `${dividend} ÷ ${divisor} = ?`;
+            document.getElementById('quotient').value = '';
+            document.getElementById('remainder').value = '';
+            document.getElementById('message').innerHTML = '';
+        }
+
+        function playSuccessEffect() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            const duration = 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function playFailureEffect() {
+            const gameContainer = document.querySelector('.game-container');
+            gameContainer.style.animation = 'explosion 0.5s ease-in-out';
+            setTimeout(() => {
+                gameContainer.style.animation = '';
+            }, 500);
+        }
+
+        function checkAnswer() {
+            const userQuotient = parseInt(document.getElementById('quotient').value) || 0;
+            const userRemainder = parseInt(document.getElementById('remainder').value) || 0;
+            const messageElement = document.getElementById('message');
+            
+            if (userQuotient === correctQuotient && userRemainder === correctRemainder) {
+                messageElement.innerHTML = '答對了！👏';
+                messageElement.className = 'result-message';
+                playSuccessEffect();
+                correctCount++;
+                updateScoreDisplay();
+                
+                setTimeout(() => {
+                    generateNewQuestion();
+                }, 1000);
+            } else {
+                let hint = '答錯了，請再試一次 😅';
+                if (userRemainder >= divisor) {
+                    hint += '<br>提示：餘數不能大於或等於除數';
+                }
+                messageElement.innerHTML = hint;
+                messageElement.className = 'error-message';
+                playFailureEffect();
+                wrongCount++;
+                updateScoreDisplay();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.input-box');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkAnswer();
+                    }
+                });
+            });
+        });
+
+        window.onload = function() {
+            loadScores();
+            generateNewQuestion();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成語配對遊戲</title>
+    <link rel="icon" type="image/png" href="https://www.iconpacks.net/icons/free-icons-7/free-english-language-learning-book-icon-24278.png">
+    <link rel="apple-touch-icon" href="https://www.iconpacks.net/icons/free-icons-7/free-english-language-learning-book-icon-24278.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            justify-content: center;
+            align-items: center;
+            font-family: "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card {
+            background: white;
+            width: 100%;
+            flex: 1;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section {
+            width: calc(100% - 30px);
+            max-width: 400px;
+            margin: 10px 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .score-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 70px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .correct-score { color: #4CAF50; }
+        .wrong-score { color: #f44336; }
+
+        .reset-button {
+            width: 100%;
+            background-color: #ff9800;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: auto 0;
+        }
+
+        .hint {
+            font-size: 1.2em;
+            margin: 10px 0;
+            color: #333;
+            text-align: center;
+        }
+
+        .word {
+            font-size: 1.8em;
+            margin: 15px 0;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.1em;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.1em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            height: auto;
+            line-height: normal;
+        }
+
+        button:disabled {
+            background: #cccccc;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .message.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .home-button {
+            display: block;
+            width: 100%;
+            padding: 8px 0;
+            background-color: #607D8B;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin: auto 0;
+        }
+
+        .home-button:hover {
+            background-color: #455A64;
+        }
+
+        @keyframes explosion {
+            0% { transform: scale(1); opacity: 1; }
+            20% { transform: scale(1.2); opacity: 0.8; }
+            40% { transform: scale(0.9); opacity: 0.6; }
+            60% { transform: scale(1.1); opacity: 0.4; }
+            80% { transform: scale(0.95); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media screen and (min-width: 768px) {
+            .container {
+                margin: 0 auto;
+                min-height: auto;
+            }
+
+            .game-card {
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+            .section {
+                width: 100%;
+                margin: 10px auto;
+                border-radius: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            color: black;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-button:hover {
+            background: #f0f0f0;
+        }
+
+        .option-button.correct {
+            background: #d4edda;
+            border-color: #4CAF50;
+        }
+
+        .option-button.incorrect {
+            background: #f8d7da;
+            border-color: #f44336;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="gameSection" class="game-card">
+            <div class="section">
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">答對</div>
+                        <div class="score-value correct-score" id="correctCount">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">答錯</div>
+                        <div class="score-value wrong-score" id="incorrectCount">0</div>
+                    </div>
+                    <div class="score-item">
+                        <a href="learning.html" class="home-button button">回主選單</a>
+                    </div>
+                    <div class="score-item">
+                        <button class="reset-button button" onclick="resetScores()">計分歸零</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div id="hint" class="hint"></div>
+                <div id="options" class="options-container">
+                    <!-- 選項會在 JavaScript 中動態生成 -->
+                </div>
+                <div id="message" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let words = [];
+        let currentWord;
+        let currentWordIndex = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        
+        const SHEET_ID = '1xHAQRzbwhVQrNnpLGpx5J06FN5u1lgqMRE02qNOlABQ';
+        const SHEET_NAME = '中文成語!A2:B';
+        const API_KEY = 'AIzaSyB9blQP6ahsTM5XCnn5qx2CUFOlERmawuI';
+
+        async function loadWords() {
+            try {
+                const response = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`
+                );
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                if (data.values && data.values.length > 0) {
+                    words = data.values.map(row => ({
+                        hint: row[0]?.trim() || '',
+                        word: row[1]?.trim() || ''
+                    })).filter(item => item.hint && item.word);
+                    
+                    console.log('成功載入單字數:', words.length);
+                    return true;
+                }
+                throw new Error('No data found');
+                
+            } catch (error) {
+                console.error('讀取 Google Sheet 失敗:', error);
+                return false;
+            }
+        }
+
+        function generateNewQuestion() {
+            if (currentWordIndex >= words.length) {
+                currentWordIndex = 0;
+                shuffleArray(words);
+            }
+            
+            currentWord = words[currentWordIndex];
+            
+            // 生成三個錯誤選項（從註釋中選擇）
+            let options = [currentWord.hint];
+            let availableWords = words.filter(w => w.hint !== currentWord.hint);
+            shuffleArray(availableWords);
+            options = options.concat(availableWords.slice(0, 3).map(w => w.hint));
+            shuffleArray(options);
+            
+            // 顯示題目（顯示成語）和選項（顯示註釋）
+            document.getElementById('hint').textContent = `題目：${currentWord.word}`;
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('message').textContent = '';
+        }
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = currentWord.hint;  // 正確答案改為註釋
+            const messageDiv = document.getElementById('message');
+            const buttons = document.querySelectorAll('.option-button');
+            
+            // 禁用所有按鈕
+            buttons.forEach(button => {
+                button.disabled = true;
+                if (button.textContent === correctAnswer) {
+                    button.classList.add('correct');
+                } else if (button.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
+                    button.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedAnswer === correctAnswer) {
+                correctCount++;
+                messageDiv.textContent = '答對了！';
+                messageDiv.className = 'message correct';
+                playSuccessEffect();
+            } else {
+                incorrectCount++;
+                messageDiv.textContent = `答錯了！正確答案是：${correctAnswer}`;
+                messageDiv.className = 'message incorrect';
+            }
+            
+            updateScoreDisplay();
+            
+            setTimeout(() => {
+                currentWordIndex++;
+                generateNewQuestion();
+            }, 1500);
+        }
+
+        // 重置遊戲
+        function resetGame() {
+            generateNewQuestion();
+        }
+
+        // 遮蔽單字
+        function maskWord(word) {
+            const words = word.split(' ');
+            return words.map(w => {
+                if (w.length <= 2) return w;
+                const positions = [];
+                const maskedWord = w.split('');
+                const maskCount = Math.floor(w.length / 2);
+                
+                while (positions.length < maskCount) {
+                    const pos = Math.floor(Math.random() * w.length);
+                    if (!positions.includes(pos) && w[pos] !== "'" && w[pos] !== "-") {
+                        positions.push(pos);
+                        maskedWord[pos] = '_';
+                    }
+                }
+                
+                return maskedWord.join('');
+            }).join(' ');
+        }
+
+        // 打亂陣列順序
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 遊戲結束
+        function endGame() {
+            const gameSection = document.getElementById('gameSection');
+            gameSection.innerHTML = `
+                <h2>遊戲結束！</h2>
+                <p>答對：${correctCount} / 答錯：${incorrectCount}</p>
+                <button onclick="location.reload()">再玩一次</button>
+            `;
+        }
+
+        // 顯示遊戲說明
+        function showInstructions() {
+            alert(`遊戲說明：
+1. 根據中文提示答英文單字
+2. 單字中會隨機遮住一些字母
+3. 可以使用鍵盤 Enter 鍵提交答案
+4. 答得一分，答錯不扣分`);
+        }
+
+        // 監聽 Enter 鍵
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('gameSection').classList.contains('hidden')) {
+                checkAnswer();
+            }
+        });
+
+        // 在頁面載入時預先載入字庫
+        window.addEventListener('DOMContentLoaded', async () => {
+            const loaded = await loadWords();
+            if (loaded) {
+                shuffleArray(words);
+                generateNewQuestion();
+            } else {
+                alert('無法載入字庫！');
+            }
+        });
+
+        function playSuccessEffect() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            const duration = 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function resetScores() {
+            correctCount = 0;
+            incorrectCount = 0;
+            updateScoreDisplay();
+            
+            const scoreBoard = document.querySelector('.score-board');
+            scoreBoard.style.animation = 'explosion 0.5s ease-in-out';
+            setTimeout(() => {
+                scoreBoard.style.animation = '';
+            }, 500);
+        }
+
+        window.onload = async function() {
+            loadScores();
+            const loaded = await loadWords();
+            if (loaded) {
+                shuffleArray(words);
+                generateNewQuestion();
+            } else {
+                alert('無法載入字庫！');
+            }
+        };
+
+        function loadScores() {
+            correctCount = parseInt(localStorage.getItem('correctCount')) || 0;
+            incorrectCount = parseInt(localStorage.getItem('incorrectCount')) || 0;
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            localStorage.setItem('correctCount', correctCount);
+            localStorage.setItem('wrongCount', incorrectCount);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程小遊戲</title>
+    <link rel="icon" type="image/png" href="https://www.iconpacks.net/icons/5/free-icon-test-document-green-checkmarks-and-pencil-17445.png">
+    <link rel="apple-touch-icon" href="https://www.iconpacks.net/icons/5/free-icon-test-document-green-checkmarks-and-pencil-17445.png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: white;
+        }
+
+        .math-button {
+            background-color: #4CAF50;
+        }
+
+        .english-button {
+            background-color: #2196F3;
+        }
+
+        .chinese-button {
+            background-color: #FF5722;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>選擇遊戲科目</h1>
+        <div class="button-group">
+            <a href="divide.html" class="button math-button">數學除法</a>
+            <a href="words.html" class="button english-button">英文單字</a>
+            <a href="chiwords.html" class="button chinese-button">成語配對</a>
+        </div>
+    </div>
+</body>
+</html> 
